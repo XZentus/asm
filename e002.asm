@@ -60,13 +60,7 @@ p10loop:
         jne p10loop
         ret
 
-section '.data' data readable writable
-
-_caption        db 'Result', 0
-_message        db '          ', 0
-_label          db ?
-
-section '.idata' import data readable writeable
+section '.idata' import data readable writable
 
   dd 0,0,0,RVA kernel_name,RVA kernel_table
   dd 0,0,0,RVA user_name,RVA user_table
@@ -86,3 +80,7 @@ section '.idata' import data readable writeable
     db 'ExitProcess',0
   _MessageBoxA dw 0
     db 'MessageBoxA',0
+
+  _caption        db 'Result', 0
+  _message        db '          ', 0
+  _label          db ?
