@@ -7,29 +7,21 @@ section '.text' readable executable code
 start:
 
         sub     rsp, 8*5
-        ;test
-        mov     rcx, 7
-        mov     rdx, 3
-        call    next_div
-        mov     rcx, 7
-        mov     rdx, 3
-        call    prev_div
-        ;~test
-        mov     rcx, 3          ; num
+        mov     rdi, 3          ; num
         mov     rbx, 0          ; acc
 
         iterloop:
                 call    isDiv3_5
                 test    al, al
                 jz      itercont
-                add     rbx, rcx
+                add     rbx, rdi
         itercont:
-                inc     rcx
-                cmp     rcx, 1000
+                inc     rdi
+                cmp     rdi, 1000
                 jb      iterloop
 
         mov     rcx, rbx
-        lea     rdx, [_label-2]
+        lea     rdx, [_result1 - 1]
         call    print10Base
 
         mov     r9,  0
@@ -43,39 +35,47 @@ start:
 
 
 print10Base:
-        mov     r10, 10
-printNBase:
-        mov     rbx, rdx
-        mov     rax, rcx
+        mov     rdi, rcx
+        mov     rsi, rdx
+        mov     r8,  0xCCCCCCCCCCCCCCCD
         p10loop:
-                xor     rdx, rdx
-                div     r10
-                add     dl, '0'
-                mov     [rbx], dl
-                dec     rbx
-                test    rax, rax
-                jnz     p10loop
+                mov     rax, rdi
+                mul     r8
+                shr     rdx, 3
+                lea     eax, [rdx + rdx]
+                lea     eax, [rax + 4*rax]
+                mov     ecx, edi
+                sub     ecx, eax
+                or      cl, 48
+                mov     [rsi], cl
+;                add     rsi, -1
+                dec     rsi
+                cmp     rdi, 9
+                mov     rdi, rdx
+                ja      p10loop
         ret
 
 
-isDiv3_5:                       ; eax edx r9d
-        mov     rax, rcx
-        xor     rdx, rdx
-        mov     r9,  3
-        div     r9
-        test    dl, dl
-        jz      d3_5
-        mov     rax, rcx
-        xor     rdx, rdx
-        mov     r9,  5
-        div     r9
-        test    dl, dl
-        jz      d3_5
-        xor     rax, rax
+isDiv3_5:
+        mov     rcx, 0xAAAAAAAAAAAAAAAB
+        mov     rax, rdi
+        mul     rcx
+        shr     rdx, 1
+        lea     rax, [rdx + 2*rdx]
+        cmp     rdi, rax
+        je      .LBB0_1
+        mov     rcx, 0xCCCCCCCCCCCCCCCD
+        mov     rax, rdi
+        mul     rcx
+        shr     rdx, 2
+        lea     rax, [rdx + 4*rdx]
+        cmp     rdi, rax
+        sete    al
         ret
-d3_5:
-        mov     rax, 1
+.LBB0_1:
+        mov     al, 1
         ret
+
 
 next_div:
         mov     rax, rcx
@@ -121,7 +121,9 @@ section '.idata' import data readable writable
         _MessageBoxA dw 0
                      db 'MessageBoxA',0
 
-        _caption1    db 'Result: iteration',0
+        _caption1    db 'Result',0
         _caption2    db 'Result: analytic',0
-        _message     db '                    ', 0
-        _label       db ?
+        _message     db '                    '
+_result1:
+                     db 13, 10, '                    '
+        _result2     db 0
