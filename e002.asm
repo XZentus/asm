@@ -10,28 +10,27 @@ start:
         xor ecx, ecx
 
 loopiter:
+                add ebx, eax
+                add eax, ebx
 
-        add ebx, eax
-        add eax, ebx
+                xor edx, edx
+                xor r8d, r8d
+                test eax, 1
+                cmove edx, eax
+                add ecx, edx
 
-        xor edx, edx
-        xor r8d, r8d
-        test eax, 1
-        cmove edx, eax
-        add ecx, edx
+                test ebx, 1
+                cmove r8d, ebx
+                add ecx, r8d
 
-        test ebx, 1
-        cmove r8d, ebx
-        add ecx, r8d
+                cmp eax, 4000000
+                jb loopiter
 
-        cmp eax, 4000000
-        jb loopiter
-
-        lea rdx, [_label - 2]
+        lea rdx, [_message_end - 1]
         call print10base
 
 
-        sub rsp, 8*5         ; reserve stack for API use and make stack dqword aligned
+        sub rsp, 8*5
 
 
         mov     r9d, 0
@@ -46,18 +45,26 @@ loopiter:
 print10base:           ;print10Base(rcx: unsigned number, rdx: ptr_back)
 
         mov rbx, rdx ; rbx: ptr
-        mov rax, rcx ; rax: number
-        mov r10, 10
+        mov rdi, rcx ; rdi: number
 
-p10loop:
-        xor rdx, rdx
-        div r10
-        add dl, '0'
-        mov [rbx], dl
-;        mov [rbx], rdx + 30
-        dec rbx
-        cmp rax, 0
-        jne p10loop
+        p10loop:
+                mov rdx, 0xCCCCCCCCCCCCCCCD ;-3689348814741910323
+                mov rax, rdi
+                mul rdx
+                mov rax, rdx
+                shr rax, 3
+                lea rdx, [rax+rax*4]
+                add rdx, rdx
+                sub rdi, rdx
+                xor edx, edx
+                add edi, '0'
+                mov dl, dil
+                mov rdi, rax
+
+                mov [rbx], dl
+                dec rbx
+                cmp rdi, 0
+                jne p10loop
         ret
 
 section '.idata' import data readable writable
@@ -81,6 +88,7 @@ section '.idata' import data readable writable
   _MessageBoxA dw 0
     db 'MessageBoxA',0
 
+  msg_len = 20
   _caption        db 'Result', 0
-  _message        db '          ', 0
-  _label          db ?
+  _message:       rept 30 { db ' ' }
+  _message_end    db 0
