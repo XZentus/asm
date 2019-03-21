@@ -28,7 +28,7 @@ start:
         call    print10Base
 
 ;       -------------------
-        xor     rcx, rcx
+        xor     ecx, ecx
         mov     rdx, upper_limit
         mov     r9,  3
         call    sum_range
@@ -104,7 +104,7 @@ isDiv3_5:                                       ; rdi%3 == 0 || rdi%5 == 0
 next_div:                       ; int: rcx, div: r9
         mov     rax, rcx
 ;        mov     r9,  rdx
-        xor     rdx, rdx
+        xor     edx, edx
         div     r9
         test    rdx, rdx
         mov     rax, rcx
@@ -117,7 +117,7 @@ next_div:                       ; int: rcx, div: r9
 prev_div:                       ; int: rcx, div: r9
         mov     rax, rcx
 ;        mov     r9,  rdx
-        xor     rdx, rdx
+        xor     edx, edx
         div     r9
         mov     rax, rcx
         sub     rax, rdx
@@ -126,7 +126,7 @@ prev_div:                       ; int: rcx, div: r9
 n_divs:                         ; from: rcx, to: rdx, div: r9
         mov     rax, rdx
         sub     rax, rcx
-        xor     rdx, rdx
+        xor     edx, edx
         div     r9
         inc     rax
         ret
