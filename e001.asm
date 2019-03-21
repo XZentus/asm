@@ -4,7 +4,7 @@ entry start
 
 section '.text' readable executable code
 
-upper_limit = 1000000000
+upper_limit = 999
 
 start:
 
@@ -20,7 +20,7 @@ start:
         .itercont:
                 inc     rdi
                 cmp     rdi, upper_limit
-                jb      .iterloop
+                jbe     .iterloop
 
         mov     rcx, rbx
 
@@ -30,10 +30,22 @@ start:
 ;       -------------------
         xor     rcx, rcx
         mov     rdx, upper_limit
+        mov     r9,  3
+        call    sum_range
+        mov     r8, rax
+
+        mov     rdx, upper_limit
         mov     r9,  5
         call    sum_range
-        mov     rcx, rax
+        add     r8,  rax
 
+        mov     rdx, upper_limit
+        mov     r9,  3*5
+        call    sum_range
+        sub     r8,  rax
+
+
+        mov     rcx, r8
         lea     rdx, [_result2 - 1]
         call    print10Base
 ;       -------------------
@@ -171,7 +183,7 @@ section '.idata' import data readable writable
 buf_len = 20
 
         _caption    db 'Result',0
-        _message:   db buf_len dup ' '
+        _message    db 'Iteration: ', buf_len dup ' '
 _result1:
-                     db 13, 10, buf_len dup ' '
-        _result2     db 0
+                    db 13, 10, 'Analytic : ', buf_len dup ' '
+        _result2    db 0
