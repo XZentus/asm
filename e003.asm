@@ -12,15 +12,15 @@ start:
 ; even? ->
         mov     ebx, 2
 .div2:
-        cmp     rax, 1
-        cmove   rcx, rbx
-        je      .done
         test    cl,  1
         jnz     .cont1
         shr     rcx, 1
         jmp     .div2
 ; <- even?
 .cont1:
+        cmp     rcx, 1
+        cmove   rcx, rbx
+        je      .done
         mov     rdi, 3
         .loop:
                 lea     rsi, [rdi * 2]
