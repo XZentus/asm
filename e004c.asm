@@ -16,7 +16,7 @@ start:
         mov     ecx, -11 ;STD_OUTPUT_HANDLE
         call    [GetStdHandle]
         mov     rcx, rax
-        lea     rdx, [_message]
+        lea     rdx, [rbx + 1]
         mov     r8,  _result - _message
         lea     r9,  [_chars_written]
         call    [WriteConsoleA]
