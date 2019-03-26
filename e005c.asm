@@ -4,8 +4,18 @@ entry start
 
 section '.text' code readable executable
 
+limit = 20
+
 start:
         sub     rsp, 5*8
+
+        lea     rsi, [_divisors]
+        mov     rdi, 1
+        .main_loop:
+                inc     rdi
+                call    update_divisors
+                cmp     rdi, limit
+                jbe     .main_loop
 
         mov     ecx, 100500
         lea     rdx, [_result - 1]
@@ -21,6 +31,62 @@ start:
         call    [WriteConsoleA]
 
         add     rsp, 5*8
+        ret
+
+update_divisors:        ;rdi: Num rsi: ptr
+        xor     edx, edx
+        xor     r9d, r9d
+        mov     rax, rdi
+        .loop_2_d:
+                cmp    rax, 1
+                je     .end_2_power
+                test   rax, 1
+                jnz    .loop_2_dend
+                inc    r9d
+                shr    rax, 1
+                jmp    .loop_2_d
+
+        .loop_2_dend:
+
+        cmp     r9b, [rsi + rcx]
+        jbe     .cont
+        mov     [rsi + 2], r9b
+        .cont:
+        mov     ecx, 3
+        mov     r8,  rax
+        xor     r9d, r9d
+
+        .loop_n_d:
+                cmp    rax, 1
+                je     .end_n
+
+                xor    edx, edx
+                div    rcx
+                test   rdx, rdx
+                jz     .loop_n_d_0rem
+                cmp    r9b, [rsi + rcx]
+                jbe    .next_div
+                mov    [rsi + rcx], r9b
+                .next_div:
+                add    ecx, 2
+                xor    r9d, r9d
+                mov    rax, r8
+                jmp    .loop_n_d
+                .loop_n_d_0rem:
+                inc    r9d
+                mov    r8,  rax
+                jmp    .loop_n_d
+
+        mov     byte [rsi + 2], r9b
+        ret
+
+        .end_2_power:
+        mov     rcx, 2
+        .end_n:
+        cmp     r9b, [rsi + rcx]
+        jbe     .end
+        mov     byte [rsi + rcx], r9b
+        .end:
         ret
 
 
@@ -71,3 +137,4 @@ buf_len = 20
         _message       db buf_len dup '0'
         _result        db 0
         _chars_written dw ?
+        _divisors      db limit dup ?
