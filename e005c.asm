@@ -12,7 +12,8 @@ start:
         sub     rsp, 5*8
 
         lea     rsi, [_divisors]
-        mov     rdi, 1
+        xor     edi, edi
+        inc     dil
         .get_divisors:
                 inc     rdi
                 call    update_divisors
@@ -152,7 +153,7 @@ section '.idata' import readable writable data
 
 buf_len = 20
 
-        _message       db buf_len dup '0'
+        _message       rb buf_len
         _result        db 0
-        _chars_written dw ?
+        _chars_written rw 1
         _divisors      db limit dup 0
