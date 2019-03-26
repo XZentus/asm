@@ -12,8 +12,7 @@ start:
         sub     rsp, 5*8
 
         lea     rsi, [_divisors]
-        xor     edi, edi
-        inc     dil
+        mov     edi, 1
         .get_divisors:
                 inc     rdi
                 call    update_divisors
